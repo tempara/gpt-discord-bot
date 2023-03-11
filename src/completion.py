@@ -48,15 +48,14 @@ async def generate_completion_response(
             convo=Conversation(messages + [Message(MY_BOT_NAME)]),
         )
         rendered = prompt.render()
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=rendered,
+       response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": messages[-1].text}],
             temperature=1.0,
-            top_p=0.9,
-            max_tokens=512,
+            max_tokens=768,
             stop=["<|endoftext|>"],
         )
-        reply = response.choices[0].text.strip()
+reply = response.choices[0].message.content
         if reply:
             flagged_str, blocked_str = moderate_message(
                 message=(rendered + reply)[-500:], user=user
